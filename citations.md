@@ -49,7 +49,7 @@ We used part of this notebook from AllAboutAI-YT to use ollama as a RAG model: [
 * React (Latest version)
 * Tailwind CSS for styling
 * Vite for build tooling
-
+* W3 and svgrepo SVG's
 ### Backend Technologies
 
 * Django REST Framework
