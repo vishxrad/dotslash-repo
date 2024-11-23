@@ -53,7 +53,7 @@ async function transformCsv(inputFile, outputFile) {
 }
 
 // Example usage
-const inputFile = "input.csv";
+const inputFile = "train.csv";
 const outputFile = "output.csv";
 
 transformCsv(inputFile, outputFile);
