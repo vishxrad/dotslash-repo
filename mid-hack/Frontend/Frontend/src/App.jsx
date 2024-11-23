@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import SearchArea from "./Components/SearchArea";
-import { image } from "@nextui-org/theme";
 
 function App() {
   const [text, setText] = useState("");
