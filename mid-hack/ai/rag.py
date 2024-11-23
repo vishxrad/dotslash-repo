@@ -14,7 +14,7 @@ def open_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as infile:
         return infile.read()
 
-def get_relevant_context(rewritten_input, vault_embeddings, vault_content, top_k=3):
+def get_relevant_context(rewritten_input, vault_embeddings, vault_content, top_k=5):
     if vault_embeddings.nelement() == 0:
         return []
     input_embedding = ollama.embeddings(model='mxbai-embed-large', prompt=rewritten_input)["embedding"]
@@ -109,7 +109,7 @@ def reset_context():
     global conversation_history, vault_embeddings_tensor, vault_content
     conversation_history = []
     vault_content = []
-    vault_file_name = "vault2.txt"
+    vault_file_name = "vault.txt"
     if os.path.exists(vault_file_name):
         with open(vault_file_name, "r", encoding='utf-8') as vault_file:
             vault_content = vault_file.readlines()
