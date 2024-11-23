@@ -408,3 +408,248 @@ The API will be available at `http://localhost:8000`
 The API uses JWT (JSON Web Tokens) for authentication:
 
 1. Obtain token:
+
+# Medical QA AI System
+
+A sophisticated medical question-answering system built using Llama 2 and RAG (Retrieval-Augmented Generation) architecture, fine-tuned on comprehensive medical data.
+
+## 🔍 Overview
+
+This project implements a medical question-answering system using:
+- Base Model: Llama 3.1 8b Instruct
+- Dataset: Comprehensive Medical Q&A Dataset from Kaggle
+- Fine-tuning: Unsloth optimization framework
+- RAG Implementation: Local RAG with ChromaDB
+- Development Environment: Google Colab
+- Model Hosting: Hugging Face Hub
+
+## 🎯 Model Architecture
+
+### Base Model: Llama 3.1 8b Instruct
+- Authors: Meta AI Research Team
+  - Lead Authors: Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, et al.
+- Size: 8 billion parameters
+- Architecture: Transformer-based language model
+- Notable Features:
+  - Instruction-tuned variant
+  - Enhanced medical domain understanding
+  - Optimized for dialogue interactions
+
+## 📊 Dataset
+
+### Medical Q&A Dataset
+- Source: Kaggle
+- URL: [Comprehensive Medical Q&A Dataset](https://www.kaggle.com/datasets/thedevastator/comprehensive-medical-q-a-dataset)
+- Statistics:
+  - Number of QA pairs: [Your dataset size]
+  - Topics covered: [Main medical categories]
+  - Languages: English
+  - Format: JSON/CSV
+
+### Data Processing
+1. Cleaning and Preprocessing
+```python
+# Example data preprocessing pipeline
+def preprocess_data(data):
+    # Remove duplicates
+    data = data.drop_duplicates()
+    
+    # Clean text
+    data['question'] = data['question'].apply(clean_text)
+    data['answer'] = data['answer'].apply(clean_text)
+    
+    return data
+```
+
+2. Data Splitting
+- Training: 80%
+- Validation: 10%
+- Testing: 10%
+
+## 🛠️ Fine-tuning
+
+### Environment Setup
+1. Google Colab Configuration
+```bash
+# Install required packages
+!pip install unsloth
+!pip install transformers
+!pip install accelerate
+```
+
+2. Unsloth Integration
+```python
+from unsloth import FastLanguageModel
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name="meta-llama/Llama-2-8b-chat",
+    max_seq_length=2048,
+    dtype=None,
+    load_in_4bit=True,
+)
+```
+
+### Training Configuration
+```python
+training_arguments = TrainingArguments(
+    output_dir="./results",
+    num_train_epochs=3,
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=4,
+    learning_rate=2e-4,
+    weight_decay=0.01,
+    warmup_steps=500,
+)
+```
+
+## 🔄 RAG Implementation
+
+Based on [Easy Local RAG](https://github.com/AllAboutAI-YT/easy-local-rag/blob/main/localrag.py)
+
+### Components
+1. Document Ingestion
+```python
+# Example document loading
+from langchain.document_loaders import DirectoryLoader
+loader = DirectoryLoader('./medical_docs', glob="**/*.pdf")
+documents = loader.load()
+```
+
+2. Vector Store Setup
+```python
+# ChromaDB initialization
+from chromadb import Chroma
+vectordb = Chroma.from_documents(
+    documents=documents,
+    embedding=embeddings,
+    persist_directory="./chroma_db"
+)
+```
+
+3. Query Pipeline
+```python
+def process_query(question):
+    # Retrieve relevant documents
+    docs = vectordb.similarity_search(question)
+    
+    # Generate context-aware response
+    response = model.generate(
+        context=docs,
+        question=question
+    )
+    return response
+```
+
+## 🤖 AI Tools Integration
+
+### Claude Integration
+- Purpose: Data preprocessing and validation
+- Implementation: API integration for data cleaning
+
+### ChatGPT Integration
+- Purpose: Response quality evaluation
+- Implementation: Automated testing pipeline
+
+## 📦 Model Deployment
+
+### Hugging Face Hub Deployment
+1. Model Packaging
+```python
+from transformers import AutoModelForCausalLM
+
+# Save model
+model.save_pretrained("medical-qa-model")
+tokenizer.save_pretrained("medical-qa-model")
+```
+
+2. Upload to Hub
+```python
+from huggingface_hub import upload_folder
+
+upload_folder(
+    folder_path="medical-qa-model",
+    repo_id="your-username/medical-qa-model",
+    repo_type="model"
+)
+```
+
+## 📊 Performance Metrics
+
+1. Question-Answering Performance
+- BLEU Score: [Your score]
+- ROUGE Score: [Your score]
+- F1 Score: [Your score]
+
+2. Response Time
+- Average latency: [Your latency]
+- p95 latency: [Your p95]
+- p99 latency: [Your p99]
+
+## 🔧 Installation
+
+1. Clone the repository:
+```bash
+git clone [your-repo-url]
+cd medical-qa-system
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Download the model:
+```bash
+python download_model.py
+```
+
+## 🚀 Usage
+
+### Local Deployment
+```python
+from medical_qa import MedicalQA
+
+# Initialize the system
+qa_system = MedicalQA()
+
+# Ask a question
+response = qa_system.ask("What are the symptoms of diabetes?")
+print(response)
+```
+
+### API Endpoint
+```bash
+curl -X POST http://your-api-endpoint/query \
+     -H "Content-Type: application/json" \
+     -d '{"question": "What are the symptoms of diabetes?"}'
+```
+
+## 📈 Future Improvements
+
+1. Model Enhancements
+- Implement multi-language support
+- Add medical image understanding
+- Improve context retention
+
+2. Technical Optimizations
+- Reduce model latency
+- Implement model quantization
+- Enhance RAG efficiency
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- Meta AI Research Team for Llama 3.1
+- Unsloth team for the optimization framework
+- Kaggle for the medical dataset
+- AllAboutAI-YT for the RAG implementation
