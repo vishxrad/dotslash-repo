@@ -1,11 +1,13 @@
+import React, { useState, useEffect } from "react";
 import SearchArea from "./Components/SearchArea";
-import { useState, useEffect } from "react";
+import { image } from "@nextui-org/theme";
+
 function App() {
   const [text, setText] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
+
   useEffect(() => {
-    // Check if browser supports speech recognition
     if ("webkitSpeechRecognition" in window) {
       const recognitionInstance = new window.webkitSpeechRecognition();
       recognitionInstance.continuous = true;
@@ -31,7 +33,6 @@ function App() {
       console.error("Speech recognition not supported in this browser");
     }
 
-    // Cleanup
     return () => {
       if (recognition) {
         recognition.stop();
@@ -50,32 +51,38 @@ function App() {
   };
 
   return (
-    <>
-      <div className=" mx-auto my-16 flex flex-col gap-6 flex-wrap justify-center items-center">
-        <SearchArea></SearchArea>
-
-        <div className="p-4">
-          <div className="mb-4">
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              className="w-full p-2 border rounded-md h-32"
-              placeholder="Your speech will appear here..."
-            />
+    <div className="mx-auto my-16 flex flex-col gap-6 flex-wrap justify-center items-center">
+      <SearchArea
+        mic={
+          <div>
+            <button className="font-mono active:bg-[rgba(0,0,0,0)]  bg-white mt-2 pb-2 w-10  text-white rounded-md">
+              <div
+                onClick={toggleListening}
+                className="bg-gradient-to-br from-black via-gray-900 to-black border-[1.5px] border-white transition duration-100 pt-2 active:translate-y-2 pb-2 rounded-md hover:shadow-lg hover:shadow-gray-50 active:shadow-gray-50/0 pl-[7px] 
+          
+        
+        "
+              >
+                {isListening ? (
+                  <img
+                    src="https://www.svgrepo.com/show/449835/microphone-slash.svg "
+                    alt="mic"
+                    className=" p-1 w-6 h-6"
+                  />
+                ) : (
+                  <img
+                    src="https://www.svgrepo.com/show/449834/microphone.svg "
+                    alt="mic"
+                    className=" p-1 w-6 h-6"
+                  />
+                )}
+              </div>
+            </button>
           </div>
-          <button
-            onClick={toggleListening}
-            className={`px-4 py-2 rounded-md ${
-              isListening
-                ? "bg-red-500 hover:bg-red-600"
-                : "bg-blue-500 hover:bg-blue-600"
-            } text-white`}
-          >
-            {isListening ? "Stop Listening" : "Start Listening"}
-          </button>
-        </div>
-      </div>
-    </>
+        }
+        voiceInput={text}
+      />
+    </div>
   );
 }
 

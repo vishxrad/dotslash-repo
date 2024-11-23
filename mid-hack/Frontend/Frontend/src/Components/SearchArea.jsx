@@ -1,12 +1,18 @@
-// SearchArea.jsx
 import React, { useState } from "react";
 import { useFetch } from "../Hooks/useFetch";
 
-export default function SearchArea() {
+// Fix: Combine all props into a single parameter
+export default function SearchArea({ voiceInput, mic }) {
   const [query, setQuery] = useState("");
   const [file, setFile] = useState(null);
   const [result, setResult] = useState("");
   const { fetchData, loading, error } = useFetch();
+
+  React.useEffect(() => {
+    if (voiceInput) {
+      setQuery(voiceInput);
+    }
+  }, [voiceInput]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +23,7 @@ export default function SearchArea() {
       formData.append("file", file);
     }
 
-    const response = await fetchData("/api/your-endpoint", {
+    const response = await fetchData("http://127.0.0.1:8000/api/process/", {
       method: "POST",
       body: formData,
     });
@@ -63,7 +69,7 @@ export default function SearchArea() {
             </svg>
           </label>
         </div>
-
+        {mic} {/* Fix: Direct use of mic prop */}
         <button
           type="submit"
           disabled={loading}
