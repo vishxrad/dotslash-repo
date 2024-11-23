@@ -33,6 +33,11 @@ export default function SearchArea({ voiceInput, mic }) {
     }
   };
 
+  const handleSpeak = () => {
+    const speech = new SpeechSynthesisUtterance(result);
+    window.speechSynthesis.speak(speech);
+  };
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
       <textarea
@@ -69,7 +74,7 @@ export default function SearchArea({ voiceInput, mic }) {
             </svg>
           </label>
         </div>
-        {mic} {/* Fix: Direct use of mic prop */}
+        {mic}
         <button
           type="submit"
           disabled={loading}
@@ -77,6 +82,19 @@ export default function SearchArea({ voiceInput, mic }) {
         >
           <div className="bg-gradient-to-br from-black via-gray-900 to-black border-[1.5px] border-white transition duration-100 pt-2 active:translate-y-2 pb-2 rounded-md hover:shadow-lg hover:shadow-gray-50 active:shadow-gray-50/0">
             {loading ? "Loading..." : "Ask"}
+          </div>
+        </button>
+        <button
+          type="button"
+          onClick={handleSpeak}
+          className="font-mono active:bg-[rgba(0,0,0,0)]  bg-white mt-2 pb-2 w-10  text-white rounded-md"
+        >
+          <div className="bg-gradient-to-br from-black via-gray-900 to-black border-[1.5px] border-white transition duration-100 pt-2 active:translate-y-2 pb-2 rounded-md hover:shadow-lg hover:shadow-gray-50 active:shadow-gray-50/0 pl-[7px] ">
+            <img
+              src="https://www.svgrepo.com/show/474996/speaker.svg"
+              alt="speak"
+              className="h-6"
+            />
           </div>
         </button>
       </div>
