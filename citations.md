@@ -325,3 +325,86 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
 - [Claude AI](https://claude.ai/) - AI integration
 - [Vite](https://vitejs.dev/) - Build tool
+
+- # Django Backend API
+
+A robust backend API built with Django REST Framework, featuring authentication, database integration, and AI-powered features using ChatGPT.
+
+## 🚀 Features
+
+- RESTful API endpoints
+- JWT Authentication
+- PostgreSQL database integration
+- ChatGPT integration for intelligent responses
+- API documentation with Swagger/OpenAPI
+- Comprehensive test coverage
+- Rate limiting and security features
+- Containerized with Docker
+
+## 📋 Prerequisites
+
+- Python 3.9+
+- PostgreSQL 13+
+- Docker (optional)
+- virtualenv or pipenv
+
+## 🛠️ Installation
+
+### Local Setup
+
+1. Create and activate virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Create `.env` file in the root directory:
+```env
+DEBUG=True
+SECRET_KEY=your-secret-key
+DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+CHATGPT_API_KEY=your-chatgpt-api-key
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+4. Run migrations:
+```bash
+python manage.py migrate
+```
+
+5. Create superuser:
+```bash
+python manage.py createsuperuser
+```
+
+### Docker Setup
+
+1. Build the Docker image:
+```bash
+docker-compose build
+```
+
+2. Run the containers:
+```bash
+docker-compose up
+```
+
+## 🏃‍♂️ Development
+
+Start the development server:
+```bash
+python manage.py runserver
+```
+
+The API will be available at `http://localhost:8000`
+
+## 🔐 Authentication
+
+The API uses JWT (JSON Web Tokens) for authentication:
+
+1. Obtain token:
