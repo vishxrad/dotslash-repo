@@ -66,6 +66,8 @@ Our project builds upon these excellent open-source libraries:
 * `transformers`: HuggingFace's transformers library
 * `datasets`: For dataset handling
 * `trl`: For supervised fine-tuning
+* `pytorch`: For finetuning the model and rag
+* `ollama client`: For running the rag
 
 ### Development Tools
 
