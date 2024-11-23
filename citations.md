@@ -1,7 +1,6 @@
 # Comprehensive Medical Q&A Dataset
 
-The link leads to a **Comprehensive Medical Q&A Dataset** on [Kaggle](https://www.kaggle.com/datasets/thedevastator/comprehensive-medical-q-a-dataset?resource=download), an excellent resource for:
-
+ **Comprehensive Medical Q&A Dataset**
 - **Medical-related Machine Learning**
 - **Natural Language Processing (NLP)**
 - **Question-Answering Systems**
