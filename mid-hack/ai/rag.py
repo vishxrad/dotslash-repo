@@ -2,19 +2,80 @@ import torch
 import ollama
 import os
 from openai import OpenAI
-import argparse
 import json
+import gradio as gr
+from pathlib import Path
+from serpapi import GoogleSearch  
 
 # Global variables for conversation history and vault content
 conversation_history = []
-vault_embeddings_tensor = torch.tensor([])  # Initially empty
+vault_embeddings_tensor = torch.tensor([])  
 vault_content = []
+client = None
 
 def open_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as infile:
         return infile.read()
 
-def get_relevant_context(rewritten_input, vault_embeddings, vault_content, top_k=5):
+def save_uploaded_file(file):
+    global vault_content, vault_embeddings_tensor
+    
+    try:
+        # Read content from uploaded file
+        with open(file.name, 'r', encoding='utf-8') as f:
+            content = f.readlines()
+        
+        # Save to vault.txt
+        with open("vault.txt", "w", encoding='utf-8') as f:
+            f.writelines(content)
+        
+        # Update vault content
+        vault_content = content
+        
+        # Generate new embeddings
+        vault_embeddings = []
+        for line in content:
+            response = ollama.embeddings(model='mxbai-embed-large', prompt=line)
+            vault_embeddings.append(response["embedding"])
+        
+        vault_embeddings_tensor = torch.tensor(vault_embeddings)
+        
+        return f"✓ File uploaded and processed successfully\n- Lines processed: {len(content)}\n- Embeddings generated: {len(vault_embeddings)}"
+    except Exception as e:
+        return f"Error processing file: {str(e)}"
+
+def append_to_vault(file):
+    global vault_content, vault_embeddings_tensor
+    
+    try:
+        # Read content from uploaded file
+        with open(file.name, 'r', encoding='utf-8') as f:
+            new_content = f.readlines()
+        
+        # Append to vault.txt
+        with open("vault.txt", "a", encoding='utf-8') as f:
+            f.writelines(new_content)
+        
+        # Update vault content
+        vault_content.extend(new_content)
+        
+        # Generate new embeddings for appended content
+        new_embeddings = []
+        for line in new_content:
+            response = ollama.embeddings(model='mxbai-embed-large', prompt=line)
+            new_embeddings.append(response["embedding"])
+        
+        # Concatenate with existing embeddings
+        if vault_embeddings_tensor.nelement() == 0:
+            vault_embeddings_tensor = torch.tensor(new_embeddings)
+        else:
+            vault_embeddings_tensor = torch.cat([vault_embeddings_tensor, torch.tensor(new_embeddings)], dim=0)
+        
+        return f"✓ File appended successfully\n- New lines added: {len(new_content)}\n- Total lines: {len(vault_content)}"
+    except Exception as e:
+        return f"Error appending file: {str(e)}"
+
+def get_relevant_context(rewritten_input, vault_embeddings, vault_content, top_k=20):
     if vault_embeddings.nelement() == 0:
         return []
     input_embedding = ollama.embeddings(model='mxbai-embed-large', prompt=rewritten_input)["embedding"]
@@ -103,7 +164,7 @@ def ollama_chat(user_input, system_message, vault_embeddings, vault_content, oll
     conversation_history.append({"role": "assistant", "content": assistant_response})
     response_data["response"] = assistant_response
     
-    return json.dumps(response_data, ensure_ascii=False, indent=2)
+    return response_data
 
 def reset_context():
     global conversation_history, vault_embeddings_tensor, vault_content
@@ -120,15 +181,12 @@ def reset_context():
         vault_embeddings.append(response["embedding"])
     
     vault_embeddings_tensor = torch.tensor(vault_embeddings)
-    return json.dumps({"status": "success", "message": "Context reset successfully"})
+    return "Context reset successfully"
 
-def initialize_rag(model_name="test2"):
+def initialize_rag(model_name="model"):
     global client, vault_content, vault_embeddings_tensor
     
-    initialization_status = {
-        "status": "initializing",
-        "steps": {}
-    }
+    status_message = ""
     
     # Initialize Ollama client
     try:
@@ -136,20 +194,18 @@ def initialize_rag(model_name="test2"):
             base_url='http://localhost:11434/v1',
             api_key='llama3'
         )
-        initialization_status["steps"]["client_initialization"] = "success"
+        status_message += "✓ Client initialized successfully\n"
     except Exception as e:
-        initialization_status["steps"]["client_initialization"] = f"failed: {str(e)}"
-        return json.dumps(initialization_status)
+        return f"Failed to initialize client: {str(e)}"
     
     # Load vault content
     try:
         if os.path.exists("vault.txt"):
             with open("vault.txt", "r", encoding='utf-8') as vault_file:
                 vault_content = vault_file.readlines()
-        initialization_status["steps"]["vault_loading"] = "success"
+        status_message += "✓ Vault content loaded successfully\n"
     except Exception as e:
-        initialization_status["steps"]["vault_loading"] = f"failed: {str(e)}"
-        return json.dumps(initialization_status)
+        return f"Failed to load vault content: {str(e)}"
     
     # Generate embeddings
     try:
@@ -158,37 +214,330 @@ def initialize_rag(model_name="test2"):
             response = ollama.embeddings(model='mxbai-embed-large', prompt=content)
             vault_embeddings.append(response["embedding"])
         vault_embeddings_tensor = torch.tensor(vault_embeddings)
-        initialization_status["steps"]["embeddings_generation"] = "success"
+        status_message += "✓ Embeddings generated successfully\n"
     except Exception as e:
-        initialization_status["steps"]["embeddings_generation"] = f"failed: {str(e)}"
-        return json.dumps(initialization_status)
+        return f"Failed to generate embeddings: {str(e)}"
     
-    initialization_status["status"] = "ready"
-    return json.dumps(initialization_status)
+    status_message += "\nSystem is ready!"
+    return status_message
 
-if __name__ == "__main__":
+def chat_interface(message, history, context_box, rewritten_query_box):
     system_message = """
     You are a helpful assistant that is an expert at extracting the most useful information from a given text. 
     You specialize in assisting with questions and providing relevant information about medical queries and interpreting patients' health reports. 
     Your responses should always bring in extra relevant medical insights, best practices, and explanations of health metrics from outside the given context, if necessary, while focusing on the specific needs of patients and healthcare professionals.
     """
     
-    # Initialize the RAG system
-    init_status = initialize_rag()
-    print(init_status)
+    response_data = ollama_chat(
+        message,
+        system_message,
+        vault_embeddings_tensor,
+        vault_content,
+        "model",
+        conversation_history
+    )
     
-    # Example of how to use the modified functions
-    while True:
-        user_input = input("Enter query (or 'quit' to exit): ")
-        if user_input.lower() == 'quit':
-            break
+    # Update the context and rewritten query displays
+    context_display = "No relevant context found."
+    if response_data["context"]:
+        context_display = response_data["context"]
+    
+    rewritten_query_display = "Original query used."
+    if response_data["rewritten_query"]:
+        rewritten_query_display = response_data["rewritten_query"]
+    
+    return response_data["response"], context_display, rewritten_query_display
+
+# Create the Gradio interface
+def create_gradio_interface():
+    # Initialize the RAG system first
+    init_status = initialize_rag()
+    
+    with gr.Blocks(theme=gr.themes.Soft()) as demo:
+        gr.Markdown("""
+        # Medical RAG Assistant
+        This system helps answer medical queries using a knowledge base of medical information.
+        """)
         
-        response_json = ollama_chat(
-            user_input,
-            system_message,
-            vault_embeddings_tensor,
-            vault_content,
-            "test2",
-            conversation_history
+        with gr.Row():
+            with gr.Column(scale=3):
+                chatbot = gr.Chatbot(height=400)
+                msg = gr.Textbox(
+                    show_label=False,
+                    placeholder="Enter your medical query here...",
+                    container=False
+                )
+                # Add location input
+                location_input = gr.Textbox(
+                    label="Your Location (city, country)",
+                    placeholder="e.g., Delhi, India",
+                    value=""
+                )
+                # Add both results boxes
+                doctor_results = gr.Markdown(
+                    value="No search performed yet.",
+                    label="Doctor Search Results"
+                )
+                medicine_results = gr.Markdown(
+                    value="No medicine search performed yet.",
+                    label="Medicine Purchase Options"
+                )
+                # Add buttons below chat
+                with gr.Row():
+                    doctor_type = gr.Button("Find Specialist")
+                    medicine_type = gr.Button("Find Medicine")
+
+            with gr.Column(scale=2):
+                with gr.Accordion("Knowledge Base Management", open=True):
+                    file_upload = gr.File(
+                        label="Upload Text File",
+                        file_types=[".txt"],
+                        file_count="single"
+                    )
+                    upload_mode = gr.Radio(
+                        choices=["Replace existing content", "Append to existing content"],
+                        value="Replace existing content",
+                        label="Upload Mode"
+                    )
+                    upload_status = gr.Textbox(
+                        label="Upload Status",
+                        value="No file uploaded yet.",
+                        interactive=False
+                    )
+                
+                with gr.Accordion("Query Processing Details", open=True):
+                    rewritten_query_box = gr.Textbox(
+                        label="Rewritten Query",
+                        value="No query processed yet.",
+                        interactive=False
+                    )
+                    context_box = gr.Textbox(
+                        label="Retrieved Context",
+                        value="No context retrieved yet.",
+                        interactive=False,
+                        lines=10
+                    )
+                system_status = gr.Textbox(
+                    label="System Status",
+                    value=init_status,
+                    interactive=False
+                )
+                clear = gr.Button("Clear Conversation")
+        
+        def process_upload(file, mode):
+            if file is None:
+                return "No file selected."
+            
+            if mode == "Replace existing content":
+                return save_uploaded_file(file)
+            else:
+                return append_to_vault(file)
+        
+        def user(user_message, history):
+            return "", history + [[user_message, None]]
+        
+        def bot(history, context_box, rewritten_query_box):
+            user_message = history[-1][0]
+            bot_message, context, rewritten = chat_interface(user_message, history, context_box, rewritten_query_box)
+            history[-1][1] = bot_message
+            return history, context, rewritten
+        
+        def clear_conversation():
+            reset_status = reset_context()
+            return (None, 
+                    "No context retrieved yet.", 
+                    "No query processed yet.",
+                    f"Conversation cleared.\n{reset_status}")
+        
+        # Add new button handlers
+        def analyze_doctor_type(vault_content, vault_embeddings_tensor):
+            prompt = """Based on the patient's medical history and conditions, identify a single, specific medical specialist that would be most appropriate. Focus on:
+            1. The primary medical condition mentioned
+            2. The most urgent medical need
+            3. The most relevant specialist
+            
+            Return ONLY the specialist type as a single word (e.g., 'Cardiologist', 'Neurologist'). If there's not enough context to determine a specific specialist, return an empty string."""
+            
+            # Get relevant context about patient's conditions
+            relevant_context = get_relevant_context(prompt, vault_embeddings_tensor, vault_content)
+            context_str = "\n".join(relevant_context) if relevant_context else "No medical context found."
+            
+            messages = [
+            {"role": "system", "content": "You are a medical expert. Your task is to identify a single appropriate specialist based on the primary condition in the context. Return ONLY the specialist type as one word. If you cannot determine a specific specialist with confidence, return an empty string."},
+            {"role": "user", "content": f"Based on this medical context, name ONE specific specialist type. Return ONLY the specialist type as one word or an empty string if uncertain. Context:\n{context_str}"}
+            ]
+            
+            response = client.chat.completions.create(
+                model="model",
+                messages=messages,
+                max_tokens=500,
+            )
+            
+            return response.choices[0].message.content
+
+        def handle_doctor_type(location):
+            if not location:
+                return "Please enter your location first.", "Please enter your location first."
+            
+            specialist_recommendation = analyze_doctor_type(vault_content, vault_embeddings_tensor)
+            if not specialist_recommendation:
+                return "Could not determine specialist type.", "Could not determine appropriate specialist type from medical context."
+            
+            search_result = search_doctors(specialist_recommendation, location)
+            
+            conversation_history.append({
+                "role": "user",
+                "content": f"Finding {specialist_recommendation}s near {location}"
+            })
+            conversation_history.append({
+                "role": "assistant",
+                "content": search_result
+            })
+            
+            return specialist_recommendation, search_result
+
+        def search_doctors(specialist_type, location):
+            try:
+                if not specialist_type or not location:
+                    return "Please provide both specialist type and location."
+                
+                # Construct search query
+                search_query = f"{specialist_type}s near {location}"
+                
+                # Call Google Search API
+                params = {
+                    "api_key": "7b60bbdc4ac1aaa076ca3b5b62855901189fe6337688a3e73af8beb958fc323b",
+                    "engine": "google",
+                    "q": search_query,
+                    "location": location,
+                    "num": 3  # Get only top result
+                }
+                
+                search = GoogleSearch(params)
+                results = search.get_dict()
+                
+                # Extract top result and format with markdown link
+                if "organic_results" in results and results["organic_results"]:
+                    top_result = results["organic_results"][0]
+                    return f"""Top Result for {search_query}:
+Title: {top_result['title']}
+Address: {top_result.get('snippet', 'No address available')}
+[Click here to view details]({top_result['link']})"""
+                else:
+                    return f"No results found for {search_query}"
+                
+            except Exception as e:
+                return f"Error performing search: {str(e)}"
+            
+        def analyze_medicine_type(vault_content, vault_embeddings_tensor):
+            prompt = """Based on the patient's medical history and conditions, identify a single, specific medication that would be most appropriate. Focus on:
+            1. The primary medical condition mentioned
+            2. Standard first-line treatments
+            3. Common medication choices
+            
+            Return ONLY the name of a single medication. If there's not enough context to make a specific recommendation, return an empty string."""
+            
+            relevant_context = get_relevant_context(prompt, vault_embeddings_tensor, vault_content)
+            context_str = "\n".join(relevant_context) if relevant_context else "No medical context found."
+            
+            messages = [
+            {"role": "system", "content": "You are a medical expert. Your task is to identify a single appropriate medication based on the primary condition in the context. Return ONLY the medication name. If you cannot determine a specific medication with confidence, return an empty string."},
+            {"role": "user", "content": f"Based on this medical context, name ONE specific medication that would be appropriate. Return ONLY the medication name or an empty string if uncertain. Context:\n{context_str}"}
+            ]
+            
+            response = client.chat.completions.create(
+                model="model",
+                messages=messages,
+                max_tokens=500,
+            )
+            
+            return response.choices[0].message.content
+
+        def search_medicine(medicine_name, location):
+            try:
+                if not medicine_name:
+                    return "Could not determine appropriate medication.", "No medication to search for."
+                
+                # Construct search query
+                search_query = f"buy {medicine_name} online pharmacy"
+                
+                # Call Google Search API
+                params = {
+                    "api_key": "7b60bbdc4ac1aaa076ca3b5b62855901189fe6337688a3e73af8beb958fc323b",
+                    "engine": "google",
+                    "q": search_query,
+                    "location": location,
+                    "num": 3
+                }
+                
+                search = GoogleSearch(params)
+                results = search.get_dict()
+                
+                # Format results with markdown links
+                if "organic_results" in results and results["organic_results"]:
+                    result_text = f"Purchase options for {medicine_name}:\n\n"
+                    for result in results["organic_results"][:3]:
+                        result_text += f"- [{result['title']}]({result['link']})\n"
+                        result_text += f"  {result.get('snippet', 'No description available')}\n\n"
+                    return medicine_name, result_text
+                else:
+                    return medicine_name, f"No online purchase options found for {medicine_name}"
+                
+            except Exception as e:
+                return medicine_name, f"Error performing search: {str(e)}"
+
+        def handle_medicine_type(location):
+            if not location:
+                return "Please enter your location first.", "Please enter your location first."
+            
+            medication_recommendation = analyze_medicine_type(vault_content, vault_embeddings_tensor)
+            if not medication_recommendation:
+                return "Could not determine appropriate medication.", "Could not determine appropriate medication from medical context."
+            
+            medicine_name, search_result = search_medicine(medication_recommendation, location)
+            
+            conversation_history.append({
+                "role": "user",
+                "content": f"Finding purchase options for {medicine_name}"
+            })
+            conversation_history.append({
+                "role": "assistant",
+                "content": f"Recommended medication: {medicine_name}"
+            })
+            
+            return medicine_name, search_result
+
+        # Add click handlers for both buttons
+        doctor_type.click(
+            handle_doctor_type,
+            inputs=[location_input],
+            outputs=[msg, doctor_results]  # Make sure we're using doctor_results
         )
-        print(response_json)
+
+        medicine_type.click(
+            handle_medicine_type,
+            inputs=[location_input],
+            outputs=[msg, medicine_results]
+        )
+
+        # Event handlers
+        file_upload.upload(
+            process_upload,
+            inputs=[file_upload, upload_mode],
+            outputs=[upload_status]
+        )
+        
+        msg.submit(user, [msg, chatbot], [msg, chatbot], queue=False).then(
+            bot, [chatbot, context_box, rewritten_query_box], 
+            [chatbot, context_box, rewritten_query_box]
+        )
+        
+        clear.click(clear_conversation, None, 
+                   [chatbot, context_box, rewritten_query_box, system_status], 
+                   queue=False)
+    
+    return demo
+
+if __name__ == "__main__":
+    demo = create_gradio_interface()
+    demo.launch(share=True, server_port=7860)
