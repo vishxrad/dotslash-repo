@@ -45,7 +45,7 @@ Our project builds upon these excellent open-source libraries:
 * Claude AI (Anthropic) and ChatGPT (OpenAI): Used for debugging assistance during development
 
 ## API used:
-*We used SerpAPI for medicine and specialised doctor recommendations : https://serpapi.com/
+* We used SerpAPI for medicine and specialised doctor recommendations : https://serpapi.com/
 
 ## Special Thanks
 
