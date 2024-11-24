@@ -6,8 +6,10 @@ import json
 import gradio as gr
 from pathlib import Path
 from serpapi import GoogleSearch  
+from dotenv import load_dotenv
 
 # Global variables for conversation history and vault content
+load_dotenv()
 conversation_history = []
 vault_embeddings_tensor = torch.tensor([])  
 vault_content = []
@@ -406,7 +408,7 @@ def create_gradio_interface():
                 
                 # Call Google Search API
                 params = {
-                    "api_key": "7b60bbdc4ac1aaa076ca3b5b62855901189fe6337688a3e73af8beb958fc323b",
+                    "api_key": os.getenv("API_KEY"),
                     "engine": "google",
                     "q": search_query,
                     "location": location,
@@ -463,7 +465,7 @@ Address: {top_result.get('snippet', 'No address available')}
                 
                 # Call Google Search API
                 params = {
-                    "api_key": "7b60bbdc4ac1aaa076ca3b5b62855901189fe6337688a3e73af8beb958fc323b",
+                    "api_key": os.getenv("API_KEY"),
                     "engine": "google",
                     "q": search_query,
                     "location": location,
