@@ -1,0 +1,127 @@
+### MEDICAL REPORT  
+
+#### SECTION 1: PATIENT’S PARTICULARS  
+**Full name of patient**: Mr Tan Ah Kow  
+**NRIC/FIN/Passport no. of patient**: S1111111X  
+**Age of patient**: 55 years old  
+
+---
+
+#### SECTION 2: DOCTOR’S PARTICULARS  
+**Full name of doctor**: Tan Ah Moi  
+**NRIC/FIN/Passport no. of doctor**: S2222222Z  
+**MCR no. of doctor**: 333333  
+**Hospital/Clinic name and address**: 1 Blackacre Hospital, Singapore 01010101  
+
+**Doctor’s qualifications and experience in this area of work**:  
+[To be provided]  
+
+**Doctor-patient relationship**:  
+I have been the doctor in charge of Mr. Tan Ah Kow since November 2010. I have seen Mr. Tan regularly since then, on average once or twice a year. For purposes of this medical report, I re-examined Mr. Tan on 20 June 2015.  
+
+---
+
+#### SECTION 3: PATIENT’S MEDICAL INFORMATION  
+
+**Patient’s clinical history**:  
+Mr. Tan Ah Kow was accompanied by his son, Mr. Tan Ah Beng, for the examination. Mr. Tan is a 55-year-old divorced, unemployed man currently living with his son in Ah Beng’s flat.  
+
+Mr. Tan has a history of hypertension and hyperlipidemia since 1990 and suffered several strokes in 2005. He later developed heart problems (cardiomyopathy), cardiac failure, and chronic renal disease, for which he was treated at ABC Hospital.  
+
+He was admitted to ABC Hospital from 1 April 2010 to 15 April 2010, during which he suffered a stroke confirmed by CT and MRI scans. Following this, he was transferred to XYZ Hospital for stroke rehabilitation and later referred to Blackacre Hospital in November 2010. He has been manifesting behavioral and psychological symptoms secondary to dementia.  
+
+Mr. Tan is currently incontinent and unable to bathe or use the toilet independently, though he can feed himself. Over the years, I have observed a gradual deterioration in his cognitive and physical condition.  
+
+---
+
+**Findings from physical/mental state examination**:  
+**Date of examination**: 20 June 2015  
+
+Mr. Tan arrived in a wheelchair. His mood was euthymic (normal, non-depressed, positive), with no psychotic symptoms observed.  
+
+1. **Orientation**:  
+   - Unable to identify the hospital clinic but recognized his son and stated his own and his son’s names.  
+   - Identified the setting as a hospital clinic after being told but could not recall the doctor’s name.  
+   - Could not recall the day, date, or year correctly, often guessing or forgetting soon after being told.  
+
+2. **Basic Information**:  
+   - Incorrectly gave his age as 50 (actual age 55).  
+   - Could not state his birthday or correct address (mistakenly mentioned Bedok instead of Jurong).  
+   - Incorrectly identified Lee Kuan Yew as the current Prime Minister.  
+
+3. **Simple Arithmetic and Financial Knowledge**:  
+   - Unable to perform basic arithmetic (e.g., 4 + 3 = 8) or subtract 7 from 10.  
+   - Could not count backward from 20 to 1.  
+   - Failed to recognize common coins and notes.  
+
+4. **Property and Affairs**:  
+   - Claimed sole ownership of a property actually jointly owned with his elderly mother.  
+   - Could not recall the flat’s address or correctly describe it.  
+   - Expressed a wish to rent the flat but did not consider his mother’s residence or plan rental details.  
+
+5. **Medical Awareness**:  
+   - Could not recall past hospitalizations, medical conditions, or medications.  
+
+---
+
+**Relevant investigation results**:  
+[Details of CT and MRI scans to be provided.]  
+
+---
+
+**Diagnosis**:  
+1. Dementia  
+2. Stroke  
+
+---
+
+#### SECTION 4: OPINION ON PATIENT’S MENTAL CAPACITY  
+
+**Mental capacity for personal welfare**:  
+- **Understand relevant information**: No  
+- **Retain information**: No  
+- **Weigh information**: No  
+- **Communicate decisions**: Yes  
+
+**Does the patient have mental capacity for personal welfare?**: No  
+
+**Mental capacity for property and affairs**:  
+- **Understand relevant information**: No  
+- **Retain information**: No  
+- **Weigh information**: No  
+- **Communicate decisions**: Yes  
+
+**Does the patient have mental capacity for property and affairs?**: No  
+
+**Basis for opinion**:  
+Mr. Tan’s dementia and stroke have impaired his cognitive and memory functions. His inability to retain or process simple information, recognize basic arithmetic, or remember essential facts about his property and medical conditions demonstrates his lack of capacity to make personal and financial decisions. His condition is unlikely to improve due to the irreversible nature of his dementia.  
+
+---
+
+#### PROGNOSIS  
+- **Is the patient likely to regain mental capacity?**: No  
+- **Would the patient understand if informed of this application?**: No  
+
+**Are there differing professional opinions on the patient’s mental capacity?**: No  
+
+---
+
+#### SECTION 5: DECLARATION  
+
+I have read and understood the provisions in sections 3, 4, and 5 of the Mental Capacity Act. I believe the opinions set out herein are correct and confirm that my duty to the Court has been fulfilled.  
+
+**Signature**: ___________________________  
+**Name**: Dr. Tan Ah Moi  
+**Date**: 20 July 2015  
+
+---
+
+**Explanatory Notes**:  
+1. "Personal welfare" refers to decisions about living arrangements and medical or dental treatment.  
+2. "Property and affairs" relates to financial matters and property.  
+3. When stating mental capacity, the basis for opinions must be provided if not obvious.  
+
+**Relevant Provisions of the Mental Capacity Act**:  
+- A person is assumed to have capacity unless proven otherwise.  
+- Capacity cannot be denied based on appearance, age, or unwise decisions.  
+- Decisions on behalf of those lacking capacity must be in their best interest and the least restrictive of their rights.  
