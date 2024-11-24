@@ -235,7 +235,7 @@ def reset_context():
     return "Context reset successfully"
 
 
-def initialize_rag(model_name="model"):
+def initialize_rag(model_name="llama-health"):
     """
     Initializes the RAG system, including the Ollama client, vault content, and embeddings.
     """
