@@ -1,0 +1,6 @@
+torch
+ollama
+openai
+gradio
+# serpapi
+python-dotenv

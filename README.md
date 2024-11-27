@@ -1,3 +1,9 @@
+---
+title: healthcare-rag
+app_file: end-hack/rag.py
+sdk: gradio
+sdk_version: 5.6.0
+---
 # dotslash-repo
 
 ## Welcome to the dotslash Hackathon Repository! 🚀

@@ -5,7 +5,7 @@ from openai import OpenAI
 import json 
 import gradio as gr  
 from pathlib import Path  
-from serpapi import GoogleSearch  
+#from serpapi import GoogleSearch  
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -332,6 +332,8 @@ def create_gradio_interface():
                     container=False
                 )
                 # Input box for user to provide location
+                # Commenting out location-based features
+                """
                 location_input = gr.Textbox(
                     label="Your Location (city, country)",
                     placeholder="e.g., Delhi, India",
@@ -351,6 +353,7 @@ def create_gradio_interface():
                 with gr.Row():
                     doctor_type = gr.Button("Find Specialist") 
                     medicine_type = gr.Button("Find Medicine")  
+                """
 
             with gr.Column(scale=2):
                 # Knowledge base management section
@@ -450,30 +453,29 @@ def create_gradio_interface():
             
             return response.choices[0].message.content
 
-        # Doctor search based on specialist type and location
+        # Commenting out search related functions
+        """
+        def search_doctors(specialist, location):
+            search_params = {
+                "q": f"{specialist} near {location}",
+                "location": location,
+                "hl": "en",
+                "gl": "us",
+                "api_key": "YOUR_SERPAPI_KEY"
+            }
+            search = GoogleSearch(search_params)
+            results = search.get_dict()
+            return json.dumps(results, indent=2)
+
         def handle_doctor_type(location):
             if not location:
                 return "Please enter your location first.", "Please enter your location first."
             
-            # Get specialist recommendation
             specialist_recommendation = analyze_doctor_type(vault_content, vault_embeddings_tensor)
             if not specialist_recommendation:
                 return "Could not determine specialist type.", "Could not determine appropriate specialist type from medical context."
             
-            # Perform Google search for doctors
             search_result = search_doctors(specialist_recommendation, location)
-            
-            def search_doctors(specialist, location):
-                search_params = {
-                    "q": f"{specialist} near {location}",
-                    "location": location,
-                    "hl": "en",
-                    "gl": "us",
-                    "api_key": "YOUR_SERPAPI_KEY"
-                }
-                search = GoogleSearch(search_params)
-                results = search.get_dict()
-                return json.dumps(results, indent=2)
             
             conversation_history.append({
                 "role": "user",
@@ -486,9 +488,6 @@ def create_gradio_interface():
             
             return specialist_recommendation, search_result
 
-       
-
-        # Function to search for medicines based on location
         def search_medicines(location):
             search_params = {
                 "q": "pharmacy near " + location,
@@ -501,12 +500,10 @@ def create_gradio_interface():
             results = search.get_dict()
             return json.dumps(results, indent=2)
 
-        # Medicine search based on location
         def handle_medicine_type(location):
             if not location:
                 return "Please enter your location first.", "Please enter your location first."
             
-            # Perform Google search for medicines
             search_result = search_medicines(location)
             
             conversation_history.append({
@@ -519,8 +516,11 @@ def create_gradio_interface():
             })
             
             return "Medicine search", search_result
-        
+        """
+
         # Attach event handlers to UI components
+        # Commenting out event handlers for search functionality
+        """
         doctor_type.click(
             handle_doctor_type,
             inputs=[location_input],
@@ -532,6 +532,7 @@ def create_gradio_interface():
             inputs=[location_input],
             outputs=[msg, medicine_results]
         )
+        """
 
         # File upload event
         file_upload.upload(
