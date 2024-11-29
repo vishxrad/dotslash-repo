@@ -5,7 +5,7 @@ from openai import OpenAI
 import json 
 import gradio as gr  
 from pathlib import Path  
-#from serpapi import GoogleSearch  
+from serpapi import GoogleSearch  
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -454,7 +454,7 @@ def create_gradio_interface():
             return response.choices[0].message.content
 
         # Commenting out search related functions
-        """
+        
         def search_doctors(specialist, location):
             search_params = {
                 "q": f"{specialist} near {location}",
@@ -516,11 +516,11 @@ def create_gradio_interface():
             })
             
             return "Medicine search", search_result
-        """
+        
 
         # Attach event handlers to UI components
         # Commenting out event handlers for search functionality
-        """
+        
         doctor_type.click(
             handle_doctor_type,
             inputs=[location_input],
@@ -532,7 +532,7 @@ def create_gradio_interface():
             inputs=[location_input],
             outputs=[msg, medicine_results]
         )
-        """
+        
 
         # File upload event
         file_upload.upload(
