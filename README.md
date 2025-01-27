@@ -1,3 +1,4 @@
+Devpost: https://devpost.com/software/remedica
 ---
 title: healthcare-rag
 app_file: end-hack/rag.py
